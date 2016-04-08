@@ -1,0 +1,30 @@
+worker_processes  2;
+
+error_log  <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/nginx/error.log;
+pid        <%= ENV['OPENSHIFT_PHP_DIR'] %>/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       <%= ENV['OPENSHIFT_PHP_DIR'] %>/etc/mime.types;
+    default_type  application/octet-stream;
+
+    port_in_redirect off;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/nginx/access.log;
+    error_log   <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/nginx/error.log;
+
+    client_body_temp_path <%= ENV['TMP'] %>/nginx/client_body;
+    proxy_temp_path       <%= ENV['TMP'] %>/nginx/prox;
+    fastcgi_temp_path     <%= ENV['TMP'] %>/nginx/fcgi;
+    uwsgi_temp_path       <%= ENV['TMP'] %>/nginx/uwsgi;
+    scgi_temp_path        <%= ENV['TMP'] %>/nginx/scgi;
+
+    include <%= ENV['OPENSHIFT_REPO_DIR'] %>/config/nginx.d/*.conf;
+}

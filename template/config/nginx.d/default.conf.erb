@@ -1,0 +1,40 @@
+server {
+    root              <%= ENV['OPENSHIFT_REPO_DIR'] %>/www;
+    listen            <%= ENV['OPENSHIFT_PHP_IP'] %>:<%= ENV['OPENSHIFT_PHP_PORT'] %>;
+    server_name       <%= ENV['OPENSHIFT_APP_DNS'] %>;
+    index             index.php index.html index.htm <%= ENV['NGINX_EXTRA_INDEX'] %>;
+
+    set_real_ip_from  <%= ENV['OPENSHIFT_PHP_IP'] %>;
+    real_ip_header    X-Forwarded-For;
+
+    # avoid caching by proxies
+    add_header        Cache-Control private;
+    
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass   unix:<%= ENV['OPENSHIFT_PHP_DIR'] %>/run/php-fpm.sock;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+        include        openshift_params;
+
+        # uncomment to export all environment variables to fastcgi
+        #include        <%= ENV['OPENSHIFT_REPO_DIR'] %>/config/nginx.d/export_env;
+    }
+
+    # avoid unnecessary log
+    location = /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
+    location = /robots.txt {
+        access_log off;
+        log_not_found off;
+    }
+
+    # Handle any other URI
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

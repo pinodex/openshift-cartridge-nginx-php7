@@ -1,0 +1,21 @@
+[global]
+error_log = <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/php/error.log
+
+[www]
+listen = <%= ENV['OPENSHIFT_PHP_DIR'] %>/run/php-fpm.sock
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+
+chdir = <%= ENV['OPENSHIFT_REPO_DIR'] %>www
+
+access.log = <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/php/access.log
+
+php_admin_value[error_log] = <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/php/error.log
+php_admin_flag[log_errors] = on
+
+php_value[session.save_handler] = files
+php_value[session.save_path] = <%= ENV['OPENSHIFT_DATA_DIR'] %>/php-session

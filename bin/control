@@ -1,0 +1,102 @@
+#!/bin/bash -e
+
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+source ${OPENSHIFT_PHP_DIR}lib/util
+
+NGINX_CONFIG_FILE=${OPENSHIFT_PHP_DIR}/etc/nginx.conf
+NGINX_PID_FILE=${OPENSHIFT_PHP_DIR}run/nginx.pid
+
+PHP_CONFIG_FILE=${OPENSHIFT_PHP_DIR}/etc/www.conf
+PHP_INI_FILE=${OPENSHIFT_PHP_DIR}/etc/php.ini
+PHP_PID_FILE=${OPENSHIFT_PHP_DIR}/run/hhvm.pid
+
+export PHP_INI_SCAN_DIR=${OPENSHIFT_REPO_DIR}/config/php.d/
+export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
+
+function _start_php() {
+    ${OPENSHIFT_PHP_DIR}/usr/bin/php-fpm -c ${PHP_INI_FILE} -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
+    echo "PHP started"
+}
+
+function _start_nginx() {
+    ${OPENSHIFT_PHP_DIR}/usr/sbin/nginx -c ${NGINX_CONFIG_FILE} >> $OPENSHIFT_PHP_LOG_DIR/nginx/stdout.log 2>&1
+    echo "Nginx started"
+}
+
+function _stop_service() {
+    if [ -f "$1" ]; then
+        pid=`cat "$1" 2>/dev/null`
+    fi
+    
+    if [ -n "$pid" ]; then
+        if kill -0 $pid > /dev/null 2>&1; then
+            client_message "killing process ${pid}"
+            kill $pid
+            wait_for_stop $pid
+        fi
+        
+        if [ -f "$1" ]; then
+            rm -f "$1"
+        fi
+    fi
+}
+
+function start() {
+    # Recreate socket
+    if [ -f ${OPENSHIFT_PHP_DIR}/run/hhvm.sock ]; then
+        unlink ${OPENSHIFT_PHP_DIR}/run/hhvm.sock
+    fi
+
+    mkdir -p /tmp/nginx
+    mkdir -p /tmp/nginx/{client_body,prox,fcgi,uwsgi,scgi}
+    mkdir -p ${OPENSHIFT_PHP_LOG_DIR}/{nginx,php}
+
+    build_config
+
+    _start_php
+    _start_nginx
+}
+
+function stop() {
+   _stop_service $NGINX_PID_FILE
+   _stop_service $PHP_PID_FILE
+}
+
+function configtest() {
+    client_message "Testing Nginx configuration files..."
+    ${OPENSHIFT_PHP_DIR}/usr/sbin/nginx -c $NGINX_CFG_FILE -g "error_log stderr;" -t
+    return $?
+}
+
+function status() {
+    if output=$(curl -I http://$OPENSHIFT_PHP_IP:$OPENSHIFT_PHP_PORT/ 2>&1 )
+    then
+        client_result "Application is running"
+    else
+        client_result "Application is either stopped or inaccessible"
+        client_result $output
+    fi
+}
+
+function tidy() {
+    client_message "Emptying log dir: $OPENSHIFT_PHP_LOG_DIR"
+    shopt -s dotglob
+    rm -rf $OPENSHIFT_PHP_LOG_DIR/*
+    return 0
+}
+
+function build() {
+    return 0
+}
+
+case "$1" in
+    start)           start;;
+    stop)            stop;;
+    restart)         stop; start;;
+    status)          status;;
+    configtest)      configtest ;;
+    tidy)            tidy;;
+    build)           build;;
+    deploy)          exit 0;;
+    *)               exit 0
+esac

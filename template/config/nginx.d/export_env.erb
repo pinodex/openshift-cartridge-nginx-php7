@@ -1,0 +1,5 @@
+<%
+ENV.each do |name, value|
+    puts "fastcgi_param #{name} '#{value}';" unless name.start_with?("OPENSHIFT_");
+end
+%>

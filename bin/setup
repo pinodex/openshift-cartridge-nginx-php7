@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+
+# Create additional directories required by the app
+mkdir -p ${OPENSHIFT_PHP_DIR}{logs,run,tmp,sessions}
+
+# Create additional directories required by nginx
+mkdir -p /tmp/nginx
+mkdir -p /tmp/nginx/{client_body,prox,fcgi,uwsgi,scgi}

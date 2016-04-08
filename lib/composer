@@ -1,0 +1,20 @@
+#!/bin/bash
+
+export COMPOSER_HOME=${OPENSHIFT_DATA_DIR}/.composer
+export PHP_INI_SCAN_DIR=${OPENSHIFT_REPO_DIR}/config/php.d/
+export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
+
+COMPOSER=${OPENSHIFT_DATA_DIR}/composer.phar
+
+function install_dependencies() {
+    if [ ! -f "$OPENSHIFT_DATA_DIR/composer.phar" ]; then
+        echo "Composer is not installed. Installing Composer..."
+        curl -s https://getcomposer.org/installer | ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini -- --install-dir=$OPENSHIFT_DATA_DIR
+    else
+        echo "Trying to update Composer..."
+        ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini $COMPOSER self-update
+    fi
+
+    echo "Installing dependencies..."
+    cd $1; ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini $COMPOSER install
+}
