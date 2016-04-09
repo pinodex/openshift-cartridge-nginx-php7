@@ -10,8 +10,6 @@ pm.start_servers = 5
 pm.min_spare_servers = 5
 pm.max_spare_servers = 35
 
-chdir = <%= ENV['OPENSHIFT_REPO_DIR'] %>www
-
 access.log = <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/php/access.log
 
 php_admin_value[error_log] = <%= ENV['OPENSHIFT_PHP_LOG_DIR'] %>/php/error.log
