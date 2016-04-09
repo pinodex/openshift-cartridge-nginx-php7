@@ -14,7 +14,7 @@ Categories:
   - php
   - nginx
   - web_framework
-Website: http://nginx.org
+Website: http://php.net
 Cart-Data:
   - Key: OPENSHIFT_TMP_DIR
     Type: environment
