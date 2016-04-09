@@ -10,12 +10,9 @@ PHP_CONFIG_FILE=${OPENSHIFT_PHP_DIR}/etc/www.conf
 PHP_INI_FILE=${OPENSHIFT_PHP_DIR}/etc/php.ini
 PHP_PID_FILE=${OPENSHIFT_PHP_DIR}/run/hhvm.pid
 
-export PHP_INI_SCAN_DIR=${OPENSHIFT_REPO_DIR}/config/php.d/
-export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
-
 function _start_php() {
     if [ ! -f $PHP_PID_FILE ]; then
-        ${OPENSHIFT_PHP_DIR}/usr/bin/php-fpm -c ${PHP_INI_FILE} -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
+        ${OPENSHIFT_PHP_DIR}/usr/bin/php-fpm -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
         echo "PHP started"
     else
         echo "PHP is running"
