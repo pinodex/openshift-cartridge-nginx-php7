@@ -6,7 +6,7 @@ source $OPENSHIFT_PHP_DIR/lib/php
 COMPOSER=${OPENSHIFT_DATA_DIR}/composer.phar
 
 function composer() {
-    $COMPOSER "$@"
+    php $COMPOSER "$@"
 }
 
 function install_composer() {
@@ -15,7 +15,7 @@ function install_composer() {
         curl -s https://getcomposer.org/installer | php -- --install-dir=$OPENSHIFT_DATA_DIR
     else
         echo "Composer already installed. Checking for updates..."
-        php composer self-update
+        composer self-update
     fi
 }
 
@@ -23,5 +23,5 @@ function install_dependencies() {
     install_composer
 
     echo "Installing dependencies..."
-    cd $1; php composer install
+    cd $1; composer install
 }
