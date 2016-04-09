@@ -15,11 +15,9 @@ rhc app create appname http://cartreflect-claytondev.rhcloud.com/github/pinodex/
 ```
 
 ## Composer
-This cartridge supports `composer install` on deploy. **_HOWEVER_**, the support is still experimental and may fail on some projects. It is still recommended to do a `composer install` locally and include the `vendor/` directory on push.
+This cartridge supports Composer right out of the box.
 
-To enable it, uncomment the corresponding lines from `.openshift/action_hooks/deploy`.
-
-The `install_dependencies` function requires the target directory as the argument. It expects `composer.json` to be in that directory. The default directory is `$OPENSHIFT_REPO_DIR` which is also your root repository directory.
+To enable `composer install` on deploy, uncomment the corresponding lines from `.openshift/action_hooks/deploy`.
 
 ## Configuration
 

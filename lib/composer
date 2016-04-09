@@ -1,27 +1,8 @@
 #!/bin/bash
 
-export COMPOSER_HOME=${OPENSHIFT_DATA_DIR}/.composer
-source $OPENSHIFT_PHP_DIR/lib/php
-
-COMPOSER=${OPENSHIFT_DATA_DIR}/composer.phar
-
-function composer() {
-    php $COMPOSER "$@"
-}
-
-function install_composer() {
-    if [ ! -f "$OPENSHIFT_DATA_DIR/composer.phar" ]; then
-        echo "Installing Composer..."
-        curl -s https://getcomposer.org/installer | php -- --install-dir=$OPENSHIFT_DATA_DIR
-    else
-        echo "Composer already installed. Checking for updates..."
-        composer self-update
-    fi
-}
-
+# You can now directly use `composer install`
+# This is just a backward compatibility support.
 function install_dependencies() {
-    install_composer
-
     echo "Installing dependencies..."
     cd $1; composer install
 }
