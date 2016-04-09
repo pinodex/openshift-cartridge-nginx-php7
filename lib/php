@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export PHP_INI_SCAN_DIR=${OPENSHIFT_REPO_DIR}/config/php.d/
+export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
+
+# Override system php
+# Won't work if a command referenced to the actual PHP path
+function php() {
+    $OPENSHIFT_PHP_DIR/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini "$@"
+}
