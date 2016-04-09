@@ -32,4 +32,5 @@ The web root directory is `www/`. Make changes to your website there, then commi
 
 ## Current Versions
 * Nginx: 1.9.14
-* PHP: 7.0.4
+* PHP: 7.0.5
+* Composer: 1.0.0
