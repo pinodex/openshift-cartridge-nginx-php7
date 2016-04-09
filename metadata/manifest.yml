@@ -7,8 +7,8 @@ License-Url: http://www.php.net/license/3_0.txt
 Vendor: PHP Group
 Cartridge-Version: 1.0.0
 Cartridge-Vendor: pinodex
-Version: '7.0'
-Versions: ['1.9', '7.0.4']
+Version: '7.0.4'
+Versions: ['1.9.14', '7.0.4']
 Categories:
   - service
   - php
