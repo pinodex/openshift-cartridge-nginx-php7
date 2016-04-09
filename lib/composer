@@ -6,14 +6,18 @@ export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
 
 COMPOSER=${OPENSHIFT_DATA_DIR}/composer.phar
 
-function install_dependencies() {
+function install_composer() {
     if [ ! -f "$OPENSHIFT_DATA_DIR/composer.phar" ]; then
-        echo "Composer is not installed. Installing Composer..."
+        echo "Installing Composer..."
         curl -s https://getcomposer.org/installer | ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini -- --install-dir=$OPENSHIFT_DATA_DIR
     else
-        echo "Trying to update Composer..."
+        echo "Composer already installed. Checking for updates..."
         ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini $COMPOSER self-update
     fi
+}
+
+function install_dependencies() {
+    install_composer
 
     echo "Installing dependencies..."
     cd $1; ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini $COMPOSER install
