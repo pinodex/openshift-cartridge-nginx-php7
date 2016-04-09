@@ -14,13 +14,21 @@ export PHP_INI_SCAN_DIR=${OPENSHIFT_REPO_DIR}/config/php.d/
 export LD_LIBRARY_PATH=${OPENSHIFT_PHP_DIR}/usr/lib64
 
 function _start_php() {
-    ${OPENSHIFT_PHP_DIR}/usr/bin/php-fpm -c ${PHP_INI_FILE} -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
-    echo "PHP started"
+    if [ ! -f $PHP_PID_FILE ]; then
+        ${OPENSHIFT_PHP_DIR}/usr/bin/php-fpm -c ${PHP_INI_FILE} -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
+        echo "PHP started"
+    else
+        echo "PHP is running"
+    fi
 }
 
 function _start_nginx() {
-    ${OPENSHIFT_PHP_DIR}/usr/sbin/nginx -c ${NGINX_CONFIG_FILE} >> $OPENSHIFT_PHP_LOG_DIR/nginx/stdout.log 2>&1
-    echo "Nginx started"
+    if [ ! -f $NGINX_PID_FILE ]; then
+        ${OPENSHIFT_PHP_DIR}/usr/sbin/nginx -c ${NGINX_CONFIG_FILE} >> $OPENSHIFT_PHP_LOG_DIR/nginx/stdout.log 2>&1
+        echo "Nginx started"
+    else
+        echo "Nginx is running"
+    fi
 }
 
 function _stop_service() {
@@ -34,10 +42,10 @@ function _stop_service() {
             kill $pid
             wait_for_stop $pid
         fi
-        
-        if [ -f "$1" ]; then
-            rm -f "$1"
-        fi
+    fi
+
+    if [ -f "$1" ]; then
+        rm -f "$1"
     fi
 }
 
