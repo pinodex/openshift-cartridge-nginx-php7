@@ -17,7 +17,11 @@ rhc app create appname http://cartreflect-claytondev.rhcloud.com/github/pinodex/
 ## Composer
 This cartridge supports Composer right out of the box.
 
-To enable `composer install` on deploy, uncomment the corresponding lines from `.openshift/action_hooks/deploy`.
+To enable `composer install` on deploy, uncomment this line from `.openshift/action_hooks/deploy`:
+
+```
+#cd $OPENSHIFT_REPO_DIR; composer install
+```
 
 ## Configuration
 
@@ -25,7 +29,7 @@ To enable `composer install` on deploy, uncomment the corresponding lines from `
 Nginx will automatically include `config/nginx.d/*.conf` files. `.conf.erb` files will be parsed and included also.
 
 ### PHP-FPM
-PHP-FPM will automatically load `config/php.d/*.ini` files. `.ini.erb` files will be parse and included also.
+PHP-FPM will automatically load `config/php.d/*.ini` files. `.ini.erb` files will be parsed and included also.
 
 ## Website
 The web root directory is `www/`. Make changes to your website there, then commit and push.
