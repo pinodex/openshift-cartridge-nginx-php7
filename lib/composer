@@ -22,3 +22,7 @@ function install_dependencies() {
     echo "Installing dependencies..."
     cd $1; ${OPENSHIFT_PHP_DIR}/usr/bin/php -c ${OPENSHIFT_PHP_DIR}/etc/php.ini $COMPOSER install
 }
+
+function composer() {
+    $COMPOSER "$@"
+}
