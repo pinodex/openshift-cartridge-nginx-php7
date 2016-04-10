@@ -80,7 +80,7 @@ function install() {
         echo $CARTRIDGE_VERSION > "${OPENSHIFT_PHP_DIR}etc/cartridge_version"
 
         service php-fpm start
-        service php-fpm start
+        service nginx start
 
         echo "Cleaning up..."
         rm "/tmp/cartridge-${CARTRIDGE_VERSION}.tar.gz"
