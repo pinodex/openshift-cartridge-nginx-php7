@@ -5,7 +5,7 @@
 # Usage:
 # $ service <name> <action> 
 
-source ${OPENSHIFT_PHP_DIR}lib/util
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
 name=$1
 action=$2

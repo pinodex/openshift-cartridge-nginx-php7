@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source $OPENSHIFT_PHP_DIR/lib/util
-
 echo "Deploying..."
 build_config
 

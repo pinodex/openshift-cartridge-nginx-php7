@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function _run_template() {
+    for conf in $@; do
+        [ -e "$conf" ] || continue
+        /usr/bin/oo-erb "$conf" > "${conf%.erb}"
+    done
+}
+
+echo "Building server configuration files..."
+_run_template ${OPENSHIFT_PHP_DIR}/etc/*.erb
+
+echo "Building nginx configuration..."
+_run_template ${OPENSHIFT_REPO_DIR}/config/nginx.d/*.erb
+
+echo "Building php-fpm configuration..."
+_run_template ${OPENSHIFT_REPO_DIR}/config/php.d/*.erb
