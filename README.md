@@ -1,6 +1,10 @@
 # OpenShift Nginx PHP 7 Cartridge
 Nginx 1.9 with PHP 7.0 on OpenShift.
 
+* Nginx: 1.9.14
+* PHP: 7.0.5
+* Composer: 1.0.0
+
 ## Installation
 
 ### Web Console
@@ -13,6 +17,14 @@ Alternatively, you can use this [cartridge definition](http://cartreflect-clayto
 ```
 rhc app create appname http://cartreflect-claytondev.rhcloud.com/github/pinodex/openshift-cartridge-nginx-php7
 ```
+
+## Updates
+You can update the binaries from the cartridge without reinstalling. To check for updates, SSH to your app and run this command:
+
+```
+update
+```
+Make sure to have your backup just in case some things went wrong.
 
 ## Composer
 This cartridge supports Composer right out of the box.
@@ -34,7 +46,16 @@ PHP-FPM will automatically load `config/php.d/*.ini` files. `.ini.erb` files wil
 ## Website
 The web root directory is `www/`. Make changes to your website there, then commit and push.
 
-## Current Versions
-* Nginx: 1.9.14
-* PHP: 7.0.5
-* Composer: 1.0.0
+## Scripts
+This cartridge comes with different scripts for easy management of your app inside SSH.
+
+* `version` - Get the version of the cartridge and the binaries.
+* `service` - A psuedo `/usr/sbin/service` to start and stop services. Example:
+    * `service php-fpm stop`
+    * `service nginx stop`
+    * `service nginx configtest`
+* `build_config` - Parses config templates to actual config file. Can be used after editing `*.erb` config files.
+* `update` - Allows automatic update of the cartridge binaries.
+    * `update check` - Check for updates
+    * `update install` - Install updates
+    * `update rollback` - Rollback to previous version after update`
