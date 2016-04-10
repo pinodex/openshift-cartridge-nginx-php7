@@ -5,6 +5,8 @@
 # Usage:
 # $ service <name> <action> 
 
+source ${OPENSHIFT_PHP_DIR}lib/util
+
 name=$1
 action=$2
 
