@@ -118,8 +118,8 @@ function rollback() {
 
         echo "Finishing process..."
 
-        service php-fpm stop
-        service nginx stop
+        service php-fpm start
+        service nginx start
 
         echo "Cleaning up..."
         rm -rf "${OPENSHIFT_PHP_DIR}.rollback"
