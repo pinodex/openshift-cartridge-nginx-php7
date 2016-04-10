@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Updater script for this cartridge
+
+MANIFEST_URL="http://cartreflect-claytondev.rhcloud.com/github/pinodex/openshift-cartridge-nginx-php7"
+MANIFEST_PARSER="${OPENSHIFT_PHP_DIR}usr/bin/manifest.py"
+MANIFEST_LOCAL="${OPENSHIFT_PHP_DIR}metadata/manifest.yml"
+
+function check() {
+    echo "Checking for updates..."
+    
+    # Get remote cartridge version
+    wget -q -O /tmp/manifest_latest.yml $MANIFEST_URL
+    eval $(python $MANIFEST_PARSER /tmp/manifest_latest.yml 'REMOTE_')
+
+    # Get local cartridge version
+    LOCAL_VERSION=$(cat "${OPENSHIFT_PHP_DIR}etc/cartridge_version")
+
+    if [ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]; then
+        echo "Version ${REMOTE_VERSION} is available:"
+        echo "  > Nginx ${REMOTE_NGINX_VERSION}"
+        echo "  > PHP ${REMOTE_PHP_VERSION}"
+        echo "  > Composer ${REMOTE_COMPOSER_VERSION}"
+        echo "Run \`update install\` to install updates."
+
+        echo $REMOTE_VERSION > /tmp/update_version
+    else
+        echo "Your cartridge is up to date."
+    fi
+}
+
+function install() {
+    if [ ! -f /tmp/update_version ]; then
+        echo "No updates available."
+        echo "Please run \`update check\` to check for updates"
+
+        return 0
+    fi
+
+    CARTRIDGE_VERSION=$(cat /tmp/update_version)
+    URL="https://github.com/pinodex/openshift-cartridge-nginx-php7/archive/${CARTRIDGE_VERSION}.tar.gz"
+
+    echo "You are updating to version ${CARTRIDGE_VERSION}."
+    echo "Make sure you have a backup just in case something gets wrong."
+
+    read -p "Proceed? [Y/n]: "
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Downloading ${CARTRIDGE_VERSION}.tar.gz..."
+        curl $URL -L > "/tmp/cartridge-${CARTRIDGE_VERSION}.tar.gz" --progress-bar
+
+        echo "Extracting ${CARTRIDGE_VERSION}.tar.gz..."
+        
+        if [ -d "/tmp/${CARTRIDGE_VERSION}" ]; then
+            rm -rf "/tmp/${CARTRIDGE_VERSION}"
+        fi
+
+        mkdir "/tmp/${CARTRIDGE_VERSION}"
+        tar -xf "/tmp/cartridge-${CARTRIDGE_VERSION}.tar.gz" -C "/tmp/${CARTRIDGE_VERSION}" --strip-components=1
+
+        echo "Preparing to apply update..."
+        
+        service php-fpm stop
+        service nginx stop
+
+        rm -rf "${OPENSHIFT_PHP_DIR}usr/"
+
+        echo "Applying update..."
+        cp -r "/tmp/${CARTRIDGE_VERSION}/usr/" "${OPENSHIFT_PHP_DIR}usr/"
+
+        echo "Finishing update..."
+        echo $CARTRIDGE_VERSION > "${OPENSHIFT_PHP_DIR}etc/cartridge_version"
+
+        service php-fpm start
+        service php-fpm start
+
+        echo "Cleaning up..."
+        rm "/tmp/cartridge-${CARTRIDGE_VERSION}.tar.gz"
+        rm -rf "/tmp/${CARTRIDGE_VERSION}"
+        rm -f /tmp/update_source_url /tmp/update_CARTRIDGE_VERSION
+
+        echo "Update complete!"
+        version
+    fi
+}
+
+case "$1" in
+    check)      check;;
+    install)    install;;
+    *)          check
+esac

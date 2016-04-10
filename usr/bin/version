@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo -e "Cartridge version: `cat ${OPENSHIFT_PHP_DIR}etc/cartridge_version`\n"
+
+nginx -v
+echo
+
+php --version
+echo
+
+composer --version
+echo
