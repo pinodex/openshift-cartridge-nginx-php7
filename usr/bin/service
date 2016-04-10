@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# This is a psuedo /usr/sbin/service
+# 
+# Usage:
+# $ service <name> <action> 
+
+name=$1
+action=$2
+
+function_name="${name}_${action}"
+
+function kill_process() {
+    if [ -f "$1" ]; then
+        pid=`cat "$1" 2>/dev/null`
+    fi
+    
+    if [ -n "$pid" ]; then
+        if kill -0 $pid > /dev/null 2>&1; then
+            client_message "Killing process ${pid}"
+            kill $pid
+            wait_for_stop $pid
+        fi
+    fi
+
+    if [ -f "$1" ]; then
+        rm -f "$1"
+    fi
+}
+
+# Service start and stop functions
+
+function php-fpm_start() {
+    echo "Starting php-fpm...";
+    
+    if [ ! -f $PHP_FPM_PID_FILE ]; then    
+        php-fpm -g ${PHP_FPM_PID_FILE} -y ${PHP_FPM_CONFIG_FILE} -D
+        echo "php-fpm has started"
+    else
+        echo "php-fpm is already running"
+    fi
+}
+
+function php-fpm_stop() {
+    echo "Stopping php-fpm...";
+    kill_process $PHP_FPM_PID_FILE
+}
+
+function php-fpm_restart() {
+    php-fpm_stop; php-fpm_start
+}
+
+function php-fpm_configtest() {
+    php-fpm -y ${PHP_FPM_CONFIG_FILE} -t
+}
+
+function nginx_start() {
+    echo "Starting nginx..."
+
+    if [ ! -f $NGINX_PID_FILE ]; then
+        nginx -c ${NGINX_CONFIG_FILE} >> $OPENSHIFT_PHP_LOG_DIR/nginx/stdout.log 2>&1
+
+        echo "nginx has started"
+    else
+        echo "nginx is already running"
+    fi
+}
+
+function nginx_stop() {
+    echo "Stopping nginx...";
+    kill_process $NGINX_PID_FILE
+}
+
+function nginx_restart() {
+    nginx_stop; nginx_start
+}
+
+function nginx_configtest() {
+    nginx -c ${NGINX_CONFIG_FILE} -t
+}
+
+# Functions caller
+
+if $(declare -f -F $function_name > /dev/null); then
+    eval ${function_name}
+else
+    echo "Invalid service name and/or action"
+fi

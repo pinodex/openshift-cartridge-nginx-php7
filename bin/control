@@ -3,85 +3,33 @@
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 source ${OPENSHIFT_PHP_DIR}lib/util
 
-NGINX_CONFIG_FILE=${OPENSHIFT_PHP_DIR}/etc/nginx.conf
-NGINX_PID_FILE=${OPENSHIFT_PHP_DIR}run/nginx.pid
-
-PHP_CONFIG_FILE=${OPENSHIFT_PHP_DIR}/etc/www.conf
-PHP_INI_FILE=${OPENSHIFT_PHP_DIR}/etc/php.ini
-PHP_PID_FILE=${OPENSHIFT_PHP_DIR}/run/hhvm.pid
-
-function _start_php() {
-    if [ ! -f $PHP_PID_FILE ]; then
-        php-fpm -g ${PHP_PID_FILE} -y ${PHP_CONFIG_FILE} -D
-        
-        echo "PHP started"
-    else
-        echo "PHP is running"
-    fi
-}
-
-function _start_nginx() {
-    if [ ! -f $NGINX_PID_FILE ]; then
-        nginx -c ${NGINX_CONFIG_FILE} >> $OPENSHIFT_PHP_LOG_DIR/nginx/stdout.log 2>&1
-
-        echo "Nginx started"
-    else
-        echo "Nginx is running"
-    fi
-}
-
-function _stop_service() {
-    if [ -f "$1" ]; then
-        pid=`cat "$1" 2>/dev/null`
-    fi
-    
-    if [ -n "$pid" ]; then
-        if kill -0 $pid > /dev/null 2>&1; then
-            client_message "killing process ${pid}"
-            kill $pid
-            wait_for_stop $pid
-        fi
-    fi
-
-    if [ -f "$1" ]; then
-        rm -f "$1"
-    fi
-}
-
 function start() {
-    # Recreate socket
-    if [ -f ${OPENSHIFT_PHP_DIR}/run/hhvm.sock ]; then
-        unlink ${OPENSHIFT_PHP_DIR}/run/hhvm.sock
-    fi
-
     mkdir -p /tmp/nginx
     mkdir -p /tmp/nginx/{client_body,prox,fcgi,uwsgi,scgi}
     mkdir -p ${OPENSHIFT_PHP_LOG_DIR}/{nginx,php}
 
     build_config
 
-    _start_php
-    _start_nginx
+    service php-fpm start
+    service nginx start
 }
 
 function stop() {
-   _stop_service $NGINX_PID_FILE
-   _stop_service $PHP_PID_FILE
+   service php-fpm stop
+   service nginx stop
 }
 
 function configtest() {
-    client_message "Testing Nginx configuration files..."
-    ${OPENSHIFT_PHP_DIR}/usr/sbin/nginx -c $NGINX_CFG_FILE -g "error_log stderr;" -t
-    return $?
+    service php-fpm configtest
+    service nginx configtest
 }
 
 function status() {
-    if output=$(curl -I http://$OPENSHIFT_PHP_IP:$OPENSHIFT_PHP_PORT/ 2>&1 )
+    if $(curl -I http://$OPENSHIFT_PHP_IP:$OPENSHIFT_PHP_PORT/ 2>&1 )
     then
         client_result "Application is running"
     else
         client_result "Application is either stopped or inaccessible"
-        client_result $output
     fi
 }
 
