@@ -1,0 +1,5 @@
+CARTRIDGE_VERSION=1.2.0
+CARTRIDGE_NGINX_VERSION=1.9.14
+CARTRIDGE_PHP_VERSION=7.0.5
+CARTRIDGE_COMPOSER_VERSION=1.0.0
+CARTRIDGE_SOURCE_URL=https://github.com/pinodex/openshift-cartridge-nginx-php7/archive/master.zip
