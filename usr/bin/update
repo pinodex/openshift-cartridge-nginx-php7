@@ -63,10 +63,18 @@ function install() {
         service php-fpm stop
         service nginx stop
 
+        # Delete old rollback files
+        rm -rf "${OPENSHIFT_PHP_DIR}.rollback"
+
+        # Backup for rollback then delete
+        mkdir "${OPENSHIFT_PHP_DIR}.rollback"
+        cp -r "${OPENSHIFT_PHP_DIR}usr/" "${OPENSHIFT_PHP_DIR}.rollback/"
+        cp "${OPENSHIFT_PHP_DIR}etc/cartridge_version" "${OPENSHIFT_PHP_DIR}.rollback/"
+
         rm -rf "${OPENSHIFT_PHP_DIR}usr/"
 
         echo "Applying update..."
-        cp -r "/tmp/${CARTRIDGE_VERSION}/usr/" "${OPENSHIFT_PHP_DIR}usr/"
+        cp -r "/tmp/${CARTRIDGE_VERSION}/usr/" $OPENSHIFT_PHP_DIR
 
         echo "Finishing update..."
         echo $CARTRIDGE_VERSION > "${OPENSHIFT_PHP_DIR}etc/cartridge_version"
@@ -84,8 +92,45 @@ function install() {
     fi
 }
 
+function rollback() {
+    if [ ! -d "${OPENSHIFT_PHP_DIR}.rollback" ]; then
+        echo "Rollback files is not available"
+
+        return 0
+    fi
+
+    ROLLBACK_VERSION=$(cat "${OPENSHIFT_PHP_DIR}.rollback/cartridge_version")
+
+    echo "This action will revert your cartridge to ${ROLLBACK_VERSION}"
+    read -p "Proceed? [Y/n]: "
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Preparing for rollback"
+        
+        service php-fpm stop
+        service nginx stop
+
+        echo "Reverting to previous version..."
+
+        rm -rf "${OPENSHIFT_PHP_DIR}usr/"
+        cp -r "${OPENSHIFT_PHP_DIR}.rollback/usr/" $OPENSHIFT_PHP_DIR
+        cp "${OPENSHIFT_PHP_DIR}.rollback/cartridge_version" "${OPENSHIFT_PHP_DIR}etc/cartridge_version"
+
+        echo "Finishing process..."
+
+        service php-fpm stop
+        service nginx stop
+
+        echo "Cleaning up..."
+        rm -rf "${OPENSHIFT_PHP_DIR}.rollback"
+
+        echo "Revert completed"
+    fi
+}
+
 case "$1" in
     check)      check;;
     install)    install;;
+    rollback)   rollback;;
     *)          check
 esac
