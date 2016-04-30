@@ -1,17 +1,3 @@
----
-locked_files:
-- bin/
-- bin/*
-- hooks/
-- hooks/*
-- lib/
-- lib/*
-- metadata/
-- metadata/*
-- usr/template/
-- usr/template/*
-- versions/
-- versions/*
 processed_templates:
 - 'bin/**/*.erb'
 - 'env/**/*.erb'
