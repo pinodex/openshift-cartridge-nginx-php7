@@ -5,10 +5,10 @@ Description: "PHP 7 on OpenShift"
 License: "The PHP License, version 3.0"
 License-Url: http://www.php.net/license/3_0.txt
 Vendor: PHP Group
-Cartridge-Version: 1.3.0
+Cartridge-Version: 1.4.0
 Cartridge-Vendor: pinodex
 Version: '7'
-Versions: ['1.9.15', '7.0.5', '1.0.0']
+Versions: ['1.9.15', '7.0.6', '1.1.0']
 Categories:
   - service
   - php
