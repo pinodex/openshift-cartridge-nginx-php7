@@ -1,7 +1,7 @@
 # OpenShift Nginx PHP 7 Cartridge
 Nginx 1.9 with PHP 7.0 on OpenShift.
 
-* Nginx: 1.11.2
+* Nginx: 1.11.3
 * PHP: 7.0.9
 * Composer: 1.2.0
 
