@@ -2,7 +2,7 @@
 Nginx 1.9 with PHP 7.0 on OpenShift.
 
 * Nginx: 1.11.2
-* PHP: 7.0.8
+* PHP: 7.0.9
 * Composer: 1.1.3
 
 ## Installation
