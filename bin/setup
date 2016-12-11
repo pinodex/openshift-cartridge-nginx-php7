@@ -2,6 +2,8 @@
 
 # Create additional directories required by the app
 mkdir -p ${OPENSHIFT_PHP_DIR}{logs,run,tmp,sessions}
+mkdir -p ${OPENSHIFT_PHP_LOG_DIR}/{nginx,php}
+mkdir -p ${OPENSHIFT_DATA_DIR}/php-session
 
 # Create additional directories required by nginx
 mkdir -p /tmp/nginx
