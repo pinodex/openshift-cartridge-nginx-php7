@@ -8,7 +8,7 @@ Vendor: PHP Group
 Cartridge-Version: 1.8.1
 Cartridge-Vendor: pinodex
 Version: '7'
-Versions: ['1.11.4', '7.0.11', '1.2.1']
+Versions: ['1.11.6', '7.0.14', '1.2.4']
 Categories:
   - service
   - php
